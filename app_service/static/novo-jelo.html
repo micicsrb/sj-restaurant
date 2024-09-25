@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Novo jelo</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="main.css" rel="stylesheet">
+    <script>
+        const cookies = document.cookie.split("=")
+        const token = cookies[cookies.length - 1]
+    </script>
+  </head>
+  <body>
+
+    <main class="container">
+      <div class="row">
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+          <div class="container-fluid">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="jela.html">Jela</a>
+              </li>
+              <li class="nav-item">
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <h1>Dodaj jelo</h1>
+      <form id="forma">
+        <div class="mb-3">
+          <label class="form-label" for="naziv">Naziv:</label>
+          <input class="form-control" id="naziv" required type="text">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="opis">Opis</label>
+          <textarea class="form-control" id="opis" required></textarea>
+        </div>
+        <div class="row mb-3">
+          <div class="col-6">
+            <label class="form-label" for="kategorija">Kategorija:</label>
+            <select class="form-select" id="kategorija" required>
+              <option value="1">Pizza</option>
+              <option value="2">Sendvič</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="cena">Cena</label>
+            <input class="form-control" id="cena" min="0" required step="1" type="number">
+          </div>
+        </div>
+        <div class="mt-3 mb-4">
+          <button class="btn btn-primary">Unesi</button>
+          <a class="btn btn-link" href="jela.html">Nazad</a>
+        </div>
+      </form>
+    </main>
+    <script>
+        window.addEventListener("load", function () {
+            document.getElementById("forma").addEventListener("submit", function (event) {
+                event.preventDefault() // Prevent default form submission
+                var validno = validacija() // Perform validation
+                if (!validno) {
+                    return
+                } // If not valid, exit
+
+                var novoJelo = {} // Create new dish object
+                novoJelo.naziv = document.getElementById("naziv").value
+                novoJelo.opis = document.getElementById("opis").value
+                novoJelo.kategorija_id = document.getElementById("kategorija").value
+                novoJelo.cena = document.getElementById("cena").value
+
+                fetch("http://localhost:9000/jelo/", {
+                    method: "POST", headers: {
+                        "Content-Type": "application/json", "Authorization": `Bearer ${token}`
+                    }, body: JSON.stringify(novoJelo)
+                })
+                    .then(succ => succ.json())
+                    .then(data => {
+                        window.location.href = `/jela.html`
+                    })
+                    .catch(err => console.log(err))
+            })
+
+            function validacija() {
+                var validno = true
+                if (document.getElementById("naziv").value.length < 3) {
+                    validno = false
+                    document.getElementById("naziv").classList.add("error")
+                    document.getElementById("naziv").classList.remove("success")
+
+                } else {
+                    document.getElementById("naziv").classList.remove("error")
+                    document.getElementById("naziv").classList.add("success")
+                }
+
+                return validno
+            }
+        })
+    </script>
+  </body>
+</html>
